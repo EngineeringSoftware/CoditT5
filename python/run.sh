@@ -2,8 +2,8 @@
 
 _DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 readonly DATASET_PATH=${_DIR}/../data
-readonly SCRIPTS_DIR=${_DIR}/../scripts
-readonly MODELS_DIR=${_DIR}/models
+readonly MODELS_DIR=${_DIR}/../models
+readonly RESULTS_DIR=${_DIR}/../results
 
 
 readonly source_pl_file=${_DIR}
@@ -31,10 +31,10 @@ function corrupt_pretrain_data() {
 # Pretrain CoditT5 from CodeT5 checkpoint
 function pretrain_CoditT5() {
 
-        mkdir -p ../models/CoditT5/pretrain
+        mkdir -p ${MODELS_DIR}/CoditT5/pretrain
 
         python -m cdt.coditT5.CodeT5 fit \
-                --exp_dir ../models/pretrain \
+                --exp_dir ${MODELS_DIR}/pretrain \
                 --data.model CoditT5 \
                 --data.dataset pretrain \
                 --config configs/pretrain-codeT5.yaml
@@ -54,9 +54,9 @@ function CoditT5_train() {
         set -e
         set -x
 
-        mkdir -p ../models/CoditT5/${dataset}
+        mkdir -p ${MODELS_DIR}/CoditT5/${dataset}
         python -m cdt.coditT5.CodeT5 fit \
-                --exp_dir ../models/CoditT5/${dataset} \
+                --exp_dir ${MODELS_DIR}/CoditT5/${dataset} \
                 --data.dataset ${dataset} \
                 --data.model CoditT5 \
                 --config configs/coditT5.yaml \
@@ -70,9 +70,9 @@ function CodeT5_train() {
         set -e
         set -x
 
-        mkdir -p ../models/CodeT5/${dataset}
+        mkdir -p ${MODELS_DIR}/CodeT5/${dataset}
         python -m cdt.coditT5.CodeT5 fit \
-                --exp_dir ../models/CodeT5/${dataset} \
+                --exp_dir ${MODELS_DIR}/CodeT5/${dataset} \
                 --data.dataset ${dataset} \
                 --config configs/codeT5.yaml \
                 $args
@@ -85,9 +85,9 @@ function CodeT5_edit_train() {
         set -e
         set -x
 
-        mkdir -p ../models/CodeT5-edit/${dataset}
+        mkdir -p ${MODELS_DIR}/CodeT5-edit/${dataset}
         python -m cdt.coditT5.CodeT5 fit \
-                --exp_dir ../models/CodeT5-edit/${dataset} \
+                --exp_dir ${MODELS_DIR}/CodeT5-edit/${dataset} \
                 --data.dataset ${dataset} \
                 --data.model CoditT5 \
                 --config configs/codeT5.yaml \
@@ -102,9 +102,9 @@ function CoditT5_generate() {
         set -e
         set -x
 
-        mkdir -p ../models/CoditT5/${dataset}
+        mkdir -p ${MODELS_DIR}/CoditT5/${dataset}
         python -m cdt.coditT5.CodeT5 test \
-                --exp_dir ../models/CoditT5/${dataset} \
+                --exp_dir ${MODELS_DIR}/CoditT5/${dataset} \
                 --data.dataset ${dataset} \
                 --data.model CoditT5 \
                 --config configs/coditT5.yaml \
@@ -118,9 +118,9 @@ function CodeT5_generate() {
         set -e
         set -x
 
-        mkdir -p ../models/CodeT5/${dataset}
+        mkdir -p ${MODELS_DIR}/CodeT5/${dataset}
         python -m cdt.coditT5.CodeT5 test \
-                --exp_dir ../models/CodeT5/${dataset} \
+                --exp_dir ${MODELS_DIR}/CodeT5/${dataset} \
                 --data.dataset ${dataset} \
                 --config configs/codeT5.yaml \
                 $args
@@ -133,9 +133,9 @@ function CodeT5_edit_generate() {
         set -e
         set -x
 
-        mkdir -p ../models/CodeT5-edit/${dataset}
+        mkdir -p ${MODELS_DIR}/CodeT5-edit/${dataset}
         python -m cdt.coditT5.CodeT5 test \
-                --exp_dir ../models/CodeT5-edit/${dataset} \
+                --exp_dir ${MODELS_DIR}/CodeT5-edit/${dataset} \
                 --data.dataset ${dataset} \
                 --data.model CoditT5 \
                 --config configs/codeT5.yaml \
@@ -149,10 +149,11 @@ function CoditT5_eval() {
 
         set -e
         set -x
-
+        
+        mkdir -p ${RESULTS_DIR}/
         # prepare data files
-        cp ../data/CoditT5/${dataset}/test.${dataset}.buggy ../models/CoditT5/${dataset}/output.src
-        cp ../data/CoditT5/${dataset}/test.${dataset}.seq ../models/CoditT5/${dataset}/output.ref
+        cp ${DATASET_DIR}/CoditT5/${dataset}/test.${dataset}.buggy ${MODELS_DIR}/CoditT5/${dataset}/output.src
+        cp ${DATASET_DIR}/CoditT5/${dataset}/test.${dataset}.seq ${MODELS_DIR}/CoditT5/${dataset}/output.ref
 
         python -m cdt.coditT5.DataProcessor post_process_model_generation --dataset ${dataset}
         python -m cdt.eval.evaluate run_evaluation \
@@ -167,10 +168,11 @@ function CodeT5_eval() {
 
         set -e
         set -x
-
+        
+        mkdir -p $RESULTS_DIR
         # prepare data files
-        cp ../data/CodeT5/${dataset}/test.${dataset}.buggy ../models/CodeT5/${dataset}/output.src
-        cp ../data/CodeT5/${dataset}/test.${dataset}.seq ../models/CodeT5/${dataset}/output.ref
+        cp ${DATASET_DIR}/CodeT5/${dataset}/test.${dataset}.buggy ${MODELS_DIR}/CodeT5/${dataset}/output.src
+        cp ${DATASET_DIR}/CodeT5/${dataset}/test.${dataset}.seq ${MODELS_DIR}/CodeT5/${dataset}/output.ref
 
         python -m cdt.eval.evaluate run_evaluation \
                 --dataset=${dataset} \
@@ -184,9 +186,10 @@ function CodeT5_edit_eval() {
         set -e
         set -x
 
+        mkdir -p $RESULTS_DIR
         # prepare data files
-        cp ../data/CodeT5/${dataset}/test.${dataset}.buggy ../models/CodeT5-edit/${dataset}/output.src
-        cp ../data/CodeT5/${dataset}/test.${dataset}.seq ../models/CodeT5-edit/${dataset}/output.ref
+        cp ${DATASET_DIR}/CodeT5/${dataset}/test.${dataset}.buggy ${MODELS_DIR}/CodeT5-edit/${dataset}/output.src
+        cp ${DATASET_DIR}/CodeT5/${dataset}/test.${dataset}.seq ${MODELS_DIR}/CodeT5-edit/${dataset}/output.ref
         
         python -m cdt.coditT5.DataProcessor post_process_model_generation \
                 --dataset ${dataset} \
@@ -210,7 +213,7 @@ function CoditT5_rerank() {
         set -x
         
         # 0. create reranks dir
-        mkdir -p ../results/reranks
+        mkdir -p ${RESULTS_DIR}/reranks
         # 1. generate top 20 sequences
         ./run.sh CoditT5_generate ${dataset} --model.num_return_sequences 20 --model.beam_size 20 --data.eval_batch_size 2
         # 2. rerank
@@ -226,7 +229,7 @@ function CodeT5_rerank() {
         set -x
         
         # 0. create reranks dir
-        mkdir -p ../results/reranks
+        mkdir -p ${RESULTS_DIR}/reranks
         # 1. generate top 20 sequences
         ./run.sh CodeT5_generate ${dataset} --model.num_return_sequences 20 --model.beam_size 20 --data.eval_batch_size 2
         # 2. rerank
