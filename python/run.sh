@@ -78,22 +78,6 @@ function CodeT5_train() {
                 $args
 }
 
-function CodeT5_edit_train() {
-        local dataset=${1:?1st arg: dataset name}; shift
-        local args="$@"
-
-        set -e
-        set -x
-
-        mkdir -p ${MODELS_DIR}/CodeT5-edit/${dataset}
-        python -m cdt.coditT5.CodeT5 fit \
-                --exp_dir ${MODELS_DIR}/CodeT5-edit/${dataset} \
-                --data.dataset ${dataset} \
-                --data.model CoditT5 \
-                --config configs/codeT5.yaml \
-                $args
-}
-
 # generate
 function CoditT5_generate() {
         local dataset=${1:?1st arg: dataset name}; shift
@@ -126,21 +110,6 @@ function CodeT5_generate() {
                 $args
 }
 
-function CodeT5_edit_generate() {
-        local dataset=${1:?1st arg: dataset name}; shift
-        local args="$@"
-
-        set -e
-        set -x
-
-        mkdir -p ${MODELS_DIR}/CodeT5-edit/${dataset}
-        python -m cdt.coditT5.CodeT5 test \
-                --exp_dir ${MODELS_DIR}/CodeT5-edit/${dataset} \
-                --data.dataset ${dataset} \
-                --data.model CoditT5 \
-                --config configs/codeT5.yaml \
-                $args
-}
 
 # eval, compute metrics
 function CoditT5_eval() {
@@ -178,28 +147,6 @@ function CodeT5_eval() {
                 --dataset=${dataset} \
                 --model="CodeT5"
 }
-
-function CodeT5_edit_eval() {
-        local dataset=${1:?1st arg: dataset name}; shift
-        local args="$@"
-
-        set -e
-        set -x
-
-        mkdir -p $RESULTS_DIR
-        # prepare data files
-        cp ${DATASET_DIR}/CodeT5/${dataset}/test.${dataset}.buggy ${MODELS_DIR}/CodeT5-edit/${dataset}/output.src
-        cp ${DATASET_DIR}/CodeT5/${dataset}/test.${dataset}.seq ${MODELS_DIR}/CodeT5-edit/${dataset}/output.ref
-        
-        python -m cdt.coditT5.DataProcessor post_process_model_generation \
-                --dataset ${dataset} \
-                --model CodeT5-edit
-
-        python -m cdt.eval.evaluate run_evaluation \
-                --dataset=${dataset} \
-                --model="CodeT5-edit"
-}
-
 
 
 # Rerank
@@ -275,14 +222,3 @@ function main() {
 }
 
 main "$@"
-
-# ==========
-# Some notes of useful Bash commands
-
-# Export Anaconda environment
-# conda env export --from-history > env.yml
-
-# Load Anaconda envrionment
-# conda env create -n NAME -f env.yml
-
-# To let pycharm recognize the structure, make python/ as source folder
