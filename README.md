@@ -74,7 +74,7 @@ And then use `conda activate cdt` to activate the created virtual environment.
 
 [sec-downloads]: #data-downloads
 
-All our data is hosted on UTBox via [a zip file](https://utexas.box.com/shared/static/9rkqnlp6wjhwyfmxce97pgb4ersfc1f9.zip).
+All our data is hosted on UTBox via [a zip file](https://utexas.box.com/s/9rkqnlp6wjhwyfmxce97pgb4ersfc1f9).
 
 Data should be downloaded to this directory with the same directory structure (e.g., `data/` from the shared folder should be downloaded as `data/` under current directory).
 
