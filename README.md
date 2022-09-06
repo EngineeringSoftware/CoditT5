@@ -4,11 +4,11 @@ This repo hosts the code and data for the following ASE 2022 paper:
 
 Title: [CoditT5: Pretraining for Source Code and Natural Language Editing](https://arxiv.org/abs/2208.05446)
 
-Authors: [Jiyang Zhang](https://jiyangzhang.github.io/), [Sheena Panthaplackel](https://panthap2.github.io/), [Pengyu Nie](http://cozy.ece.utexas.edu/~pynie/), [Junyi Jessy Li](https://jessyli.com/), [Milos Gligoric](http://users.ece.utexas.edu/~gligoric/)
+Authors: [Jiyang Zhang](https://jiyangzhang.github.io/), [Sheena Panthaplackel](https://panthap2.github.io/), [Pengyu Nie](https://pengyunie.github.io/), [Junyi Jessy Li](https://jessyli.com/), [Milos Gligoric](http://users.ece.utexas.edu/~gligoric/)
 
 ```bibtex
 @inproceedings{ZhangETAL22CoditT5,
-  author = {Zhang, Jiyang and Nie, Pengyu and Panthaplackel, Sheena and Li, Junyi Jessy and Gligoric, Milos},
+  author = {Zhang, Jiyang and Panthaplackel, Sheena and Nie, Pengyu and Li, Junyi Jessy and Gligoric, Milos},
   title = {CoditT5: Pretraining for Source Code and Natural Language Editing},
   booktitle = {International Conference on Automated Software Engineering},
   pages = {To appear},
@@ -18,8 +18,8 @@ Authors: [Jiyang Zhang](https://jiyangzhang.github.io/), [Sheena Panthaplackel](
 
 ## Introduction
 
-This repo contains the code and artifacts for producing the experiments in [CoditT5: Pretraining for Source Code and Natural Language Editing ](https://arxiv.org/abs/2208.05446)
-In this work, we introduce CoditT5 for software **edit** tasks. CoditT5 is a large Language Model pretrained with a novel objective to explicitly model edits. CoditT5 sets the state-of-the-art for comment update, bug fixing and automated code review.
+This repo contains the code and artifacts for reproducing the experiments in [CoditT5: Pretraining for Source Code and Natural Language Editing](https://arxiv.org/abs/2208.05446).
+In this work, we introduce CoditT5 for software **edit** tasks. CoditT5 is a large Language Model pretrained with a novel objective to explicitly model edits. CoditT5 sets the state-of-the-art for downstream tasks including comment updating, bug fixing and automated code review.
 
 The code includes:
 
@@ -84,9 +84,9 @@ Data should be downloaded to this directory with the same directory structure (e
 
 ### Synthesize Pretraining Data
 
-We provide sample scripts to synthesize (corrupt) the pretraining dataset for CoditT5.
+We provide sample scripts to synthesize the pretraining dataset (by corrupting programming language code snippets and natural language comments) for CoditT5.
 
-First, prepare the Programming language and Natural language data for pretraining; Then specify the following variables in the function `corrupt_pretrain_data()` in `python/run.sh`:
+First, prepare the programming language and natural language data for pretraining; Then specify the following variables in the function `corrupt_pretrain_data()` in `python/run.sh`:
 
 - `source_pl_file`: the path of data file where each line is a programming language function;
 - `tokenized_pl_file`: the path of tokenized version of `source_pl_file`;
@@ -126,7 +126,7 @@ Where `${dataset}` is the name of the dataset (comment-update, code-review, bf-s
 
 Notes:
 
-- Model's input data file name ends with `.buggy`; model's target output (edit plan + generation) file name ends with `fixed`; target generation file name ends with `seq`.
+- Model's input data file name ends with `.buggy`; model's target output (edit plan + generation) file name ends with `.fixed`; target generation file name ends with `.seq`.
 - Model's input is in the form of `source_sequence </s> context_sequence`; and model's output is in the form of `edit_plan <s> target_sequence`
 - Raw data files are stored in `raw_data/`, processed data files are generated to `data/CoditT5/${dataset}`
 - Note that for the comment-update dataset, the processed `edit_plan` is the edits applied to the comment w/o parameter (@return, @param)
@@ -183,9 +183,9 @@ Results are generated to `results/`:
 
 - `scores-${dataset}-${model}.json`: the list of automatic metrics per sample.
 
-## Code for Cobining CodeT5 and CoditT5
+## Code for Combining CodeT5 and CoditT5
 
-[sec-rerank]: #code-for-cobining-codet5-and-coditt5
+[sec-rerank]: #code-for-combining-codet5-and-coditt5
 
 Requires the dataset at `data/${model}/${dataset}/`, the trained models at `models/${model}/${dataset}/model/`.
 
@@ -208,7 +208,7 @@ Main results are generated to `results/reranks/`:
 ### Compute automatic metrics
 
 Requires the model's reranking results file
-`results/reranks/test-${dataset}-${model}-top-20-rerank-${reranker}-results.json`
+`results/reranks/test-${dataset}-${model}-top-20-rerank-${reranker}-results.json`.
 
 ```
 ./run.sh eval_rerank_${model}_${reranker} ${dataset}
