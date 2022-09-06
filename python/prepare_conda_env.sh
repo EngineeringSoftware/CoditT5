@@ -27,14 +27,10 @@ function get_cuda_version() {
         else
                 local cuda_version_number="$(nvcc -V | grep "release" | sed -E "s/.*release ([^,]+),.*/\1/")"
                 case $cuda_version_number in
-                10.0*)
-                        echo "cu100";;
-                10.1*)
-                        echo "cu101";;
                 10.2*)
                         echo "cu102";;
-                11.0*)
-                        echo "cu110";;
+                11.3*)
+                        echo "cu113";;
                 *)
                         echo "Unsupported cuda version $cuda_version_number!" 1>&2
                         exit 1
@@ -64,14 +60,10 @@ function prepare_conda_env() {
         case $cuda_version in
         cpu)
                 cuda_toolkit=cpuonly;;
-        cu100)
-                cuda_toolkit="cudatoolkit=10.0";;
-        cu101)
-                cuda_toolkit="cudatoolkit=10.1";;
         cu102)
                 cuda_toolkit="cudatoolkit=10.2";;
-        cu110)
-                cuda_toolkit="cudatoolkit=11.0";;
+        cu113)
+                cuda_toolkit="cudatoolkit=11.3";;
         *)
                 echo "Unexpected cuda version $cuda_version!" 1>&2
                 exit 1
