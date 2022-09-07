@@ -63,7 +63,7 @@ function prepare_conda_env() {
         cu102)
                 cuda_toolkit="cudatoolkit=10.2";;
         cu113)
-                cuda_toolkit="cudatoolkit=11.3";;
+                cuda_toolkit="cudatoolkit=11.3 -c conda-forge";;
         *)
                 echo "Unexpected cuda version $cuda_version!" 1>&2
                 exit 1
@@ -71,7 +71,7 @@ function prepare_conda_env() {
         
         conda install -y pytorch=${PYTORCH_VERSION} torchvision=${TORCHVISION_VERSION} ${cuda_toolkit} -c pytorch
 
-        conda install -c conda-forge jsonnet
+        conda install -y -c conda-forge jsonnet
 
         # Other libraries
         pip install -r requirements.txt

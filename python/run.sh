@@ -14,16 +14,23 @@ function corrupt_pretrain_data() {
         local RAWDATA_DIR=${_DIR}/../raw_data
         local source_pl_file=${1:-${RAWDATA_DIR}/pretrain/train.csn.pl}; shift
         local tokenized_pl_file=${1:-${DATASET_DIR}/pretrain/csn.pl.fixed}; shift
-        local corrupt_code_file=${1:-${DATASET_DIR}/pretrain/csn.pl.buggy}; shift
+        local corrupt_pl_file=${1:-${DATASET_DIR}/pretrain/csn.pl.buggy}; shift
 
         local source_nl_file=${1:-${RAWDATA_DIR}/pretrain/train.csn.nl}; shift
         local tokenized_nl_file=${1:-${DATASET_DIR}/pretrain/csn.nl.fixed}; shift
         local corrupt_nl_file=${1:-${DATASET_DIR}/pretrain/csn.nl.buggy}; shift
 
+        mkdir -p "$(dirname $source_pl_file)"
+        mkdir -p "$(dirname $tokenized_pl_file)"
+        mkdir -p "$(dirname $corrupt_pl_file)"
+        mkdir -p "$(dirname $source_nl_file)"
+        mkdir -p "$(dirname $tokenized_nl_file)"
+        mkdir -p "$(dirname $corrupt_nl_file)"
+
         python -m cdt.collector.mask corrupt_code \
                 --java_file $source_pl_file \
                 --fixed_file $tokenized_pl_file \
-                --output_file $corrupt_code_file
+                --output_file $corrupt_pl_file
         
         python -m cdt.collector.mask corrupt_nl \
                 --nl_file $source_nl_file \

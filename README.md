@@ -57,8 +57,8 @@ Our code require the following hardware and software environments.
 
 Additional requirements for training and evaluating ML models:
 
-- GPU: NVIDIA GTX 1080 or better
-- CUDA: 10.0 ~ 11.0
+- GPU: NVIDIA GTX 1080 Ti or better (with >= 11GB memory)
+- CUDA: 10.2 or 11.3
 - Disk space: 2 GB per trained model
 
 [Anaconda](https://www.anaconda.com/products/individual#Downloads) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html) is required for installing the other Python library dependencies. Once Anaconda/Miniconda is installed, you can use the following command to setup a virtual environment, named `cdt`, with the Python library dependencies installed:
