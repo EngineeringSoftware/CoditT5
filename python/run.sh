@@ -1,25 +1,26 @@
 #!/bin/bash
 
 _DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-readonly DATASET_PATH=${_DIR}/../data
+readonly DATASET_DIR=${_DIR}/../data
 readonly MODELS_DIR=${_DIR}/../models
 readonly RESULTS_DIR=${_DIR}/../results
 
 
-readonly source_pl_file=${_DIR}
-readonly tokenized_pl_file=${_DIR}
-readonly corrupt_pl_file=${_DIR}
-
-readonly source_nl_file=${_DIR}
-readonly tokenized_nl_file=${_DIR}
-readonly corrupt_nl_file=${_DIR}
-
 # corrupt file for pretraining CoditT5
 function corrupt_pretrain_data() {
 
+        local RAWDATA_DIR=${_DIR}/../raw_data
+        local source_pl_file=${1:-${RAWDATA_DIR}/pretrain/train.csn.pl}; shift
+        local tokenized_pl_file=${1:-${DATASET_DIR}/pretrain/csn.pl.fixed}; shift
+        local corrupt_code_file=${1:-${DATASET_DIR}/pretrain/csn.pl.buggy}; shift
+
+        local source_nl_file=${1:-${RAWDATA_DIR}/pretrain/train.csn.nl}; shift
+        local tokenized_nl_file=${1:-${DATASET_DIR}/pretrain/csn.nl.fixed}; shift
+        local corrupt_nl_file=${1:-${DATASET_DIR}/pretrain/csn.nl.buggy}; shift
+
         python -m cdt.collector.mask corrupt_code \
-                --java_file $source_code_file \
-                --fixed_file $tokenized_code_file \
+                --java_file $source_pl_file \
+                --fixed_file $tokenized_pl_file \
                 --output_file $corrupt_code_file
         
         python -m cdt.collector.mask corrupt_nl \
