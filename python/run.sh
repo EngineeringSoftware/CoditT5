@@ -9,6 +9,8 @@ readonly RESULTS_DIR=${_DIR}/../results
 # corrupt file for pretraining CoditT5
 function corrupt_pretrain_data() {
 
+        mkdir -p ${DATASET_DIR}/pretrain
+
         local RAWDATA_DIR=${_DIR}/../raw_data
         local source_pl_file=${1:-${RAWDATA_DIR}/pretrain/train.csn.pl}; shift
         local tokenized_pl_file=${1:-${DATASET_DIR}/pretrain/csn.pl.fixed}; shift
