@@ -9,16 +9,16 @@ readonly RESULTS_DIR=${_DIR}/../results
 # corrupt file for pretraining CoditT5
 function corrupt_pretrain_data() {
 
-        mkdir -p ${DATASET_DIR}/pretrain
+        mkdir -p ${DATASET_DIR}/CoditT5/pretrain
 
         local RAWDATA_DIR=${_DIR}/../raw_data
         local source_pl_file=${1:-${RAWDATA_DIR}/pretrain/train.csn.pl}; shift
-        local tokenized_pl_file=${1:-${DATASET_DIR}/pretrain/csn.pl.fixed}; shift
-        local corrupt_pl_file=${1:-${DATASET_DIR}/pretrain/csn.pl.buggy}; shift
+        local tokenized_pl_file=${1:-${DATASET_DIR}/CoditT5/pretrain/csn.pl.fixed}; shift
+        local corrupt_pl_file=${1:-${DATASET_DIR}/CoditT5/pretrain/csn.pl.buggy}; shift
 
         local source_nl_file=${1:-${RAWDATA_DIR}/pretrain/train.csn.nl}; shift
-        local tokenized_nl_file=${1:-${DATASET_DIR}/pretrain/csn.nl.fixed}; shift
-        local corrupt_nl_file=${1:-${DATASET_DIR}/pretrain/csn.nl.buggy}; shift
+        local tokenized_nl_file=${1:-${DATASET_DIR}/CoditT5/pretrain/csn.nl.fixed}; shift
+        local corrupt_nl_file=${1:-${DATASET_DIR}/CoditT5/pretrain/csn.nl.buggy}; shift
 
         mkdir -p "$(dirname $source_pl_file)"
         mkdir -p "$(dirname $tokenized_pl_file)"
