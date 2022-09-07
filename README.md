@@ -126,9 +126,9 @@ Where `${dataset}` is the name of the dataset (comment-update, code-review, bf-s
 
 Notes:
 
-- Model's input data file name ends with `.buggy`; model's target output (edit plan + generation) file name ends with `.fixed`; target generation file name ends with `.seq`.
-- Model's input is in the form of `source_sequence </s> context_sequence`; and model's output is in the form of `edit_plan <s> target_sequence`
-- Raw data files are stored in `raw_data/`, processed data files are generated to `data/CoditT5/${dataset}`
+- CoditT5's input data file name ends with `.buggy`; CoditT5's target output (edit plan + generation) file name ends with `.fixed`; target generation file name ends with `.seq`.
+- CoditT5's input is in the form of `source_sequence </s> context_sequence`; and CoditT5's output is in the form of `edit_plan <s> target_sequence`
+- Raw data files are stored in `raw_data/` (we provide some examples for demo), processed data files are generated to `data/CoditT5/${dataset}`
 - Note that for the comment-update dataset, the processed `edit_plan` is the edits applied to the comment w/o parameter (@return, @param)
 
 ## Code for Training and Evaluating Models
