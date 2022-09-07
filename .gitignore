@@ -1,0 +1,8 @@
+# temp files
+*~
+\#*\#
+
+# data and models
+/data/
+/models/
+/raw_data/
