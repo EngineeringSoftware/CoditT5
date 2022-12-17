@@ -9,9 +9,8 @@ Authors: [Jiyang Zhang](https://jiyangzhang.github.io/), [Sheena Panthaplackel](
 ```bibtex
 @inproceedings{ZhangETAL22CoditT5,
   author = {Zhang, Jiyang and Panthaplackel, Sheena and Nie, Pengyu and Li, Junyi Jessy and Gligoric, Milos},
-  title = {CoditT5: Pretraining for Source Code and Natural Language Editing},
+  title = {Codit{T}5: Pretraining for Source Code and Natural Language Editing},
   booktitle = {International Conference on Automated Software Engineering},
-  pages = {To appear},
   year = {2022},
 }
 ```
