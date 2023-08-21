@@ -226,7 +226,7 @@ class DatasetCorrupt:
 
     @classmethod
     def get_mask_start_end_ids(
-        cls, mask_indices: np.array
+        cls, mask_indices: np.ndarray
     ) -> Tuple[List[int], List[int]]:
         """Return mask start and end ids."""
         start_indices = mask_indices - np.roll(mask_indices, 1, axis=-1) * mask_indices

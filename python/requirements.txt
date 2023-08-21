@@ -7,7 +7,6 @@ sentencepiece==0.1.96
 setuptools==58.0.4
 seutil==0.8.4
 six==1.16.0
-torch==1.9.0
 tqdm==4.62.3
 transformers==4.16.2
 tree_sitter==0.20.0
