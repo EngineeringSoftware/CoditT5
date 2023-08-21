@@ -58,10 +58,9 @@ The artifacts include:
 from transformers import T5ForConditionalGeneration, AutoTokenizer
 
 checkpoint = "JiyangZhang/CoditT5"
-device = "cuda" # for GPU usage or "cpu" for CPU usage
 
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
-model = T5ForConditionalGeneration.from_pretrained(checkpoint).to(device)
+model = T5ForConditionalGeneration.from_pretrained(checkpoint)
 
 code_input = """class HelloWorld { public static void main(String[] args) { System.out.println("Hello, World!")"""
 
