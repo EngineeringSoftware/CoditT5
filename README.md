@@ -19,7 +19,7 @@ Authors: [Jiyang Zhang](https://jiyangzhang.github.io/), [Sheena Panthaplackel](
 **Aug 2023**
 
 **CoditT5** models are released on 🤗 ! 🔥 
-[link](https://huggingface.co/models?sort=downloads&search=codet5p) 
+[link](https://huggingface.co/JiyangZhang/CoditT5) 
 ## Introduction
 
 This repo contains the code and artifacts for reproducing the experiments in [CoditT5: Pretraining for Source Code and Natural Language Editing](https://arxiv.org/abs/2208.05446).
