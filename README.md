@@ -16,6 +16,11 @@ Authors: [Jiyang Zhang](https://jiyangzhang.github.io/), [Sheena Panthaplackel](
 }
 ```
 
+## News
+**Aug 2023**
+
+**CoditT5** models are released on 🤗 ! 🔥 
+[link](https://huggingface.co/models?sort=downloads&search=codet5p) 
 ## Introduction
 
 This repo contains the code and artifacts for reproducing the experiments in [CoditT5: Pretraining for Source Code and Natural Language Editing](https://arxiv.org/abs/2208.05446).
@@ -37,12 +42,35 @@ The artifacts include:
 
 ## Table of Contents
 
-1. [Dependency][sec-dependency]
-2. [Data Downloads][sec-downloads]
-3. [Code for Pretraining][sec-pretrain]
-4. [Code for Processing Fine-tuning Data][sec-process]
-5. [Code for Training and Evaluating Models][sec-traineval]
-6. [Code for Cobining CodeT5 and CoditT5][sec-rerank]
+
+1. [How to Use][sec-howto]
+2. [Dependency][sec-dependency]
+3. [Data Downloads][sec-downloads]
+4. [Code for Pretraining][sec-pretrain]
+5. [Code for Processing Fine-tuning Data][sec-process]
+6. [Code for Training and Evaluating Models][sec-traineval]
+7. [Code for Combining CodeT5 and CoditT5][sec-rerank]
+
+## How to Use
+
+[sec-howto]: #how-to-use
+
+```python
+from transformers import T5ForConditionalGeneration, AutoTokenizer
+
+checkpoint = "JiyangZhang/CoditT5"
+device = "cuda" # for GPU usage or "cpu" for CPU usage
+
+tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+model = T5ForConditionalGeneration.from_pretrained(checkpoint).to(device)
+
+code_input = """class HelloWorld { public static void main(String[] args) { System.out.println("Hello, World!")"""
+
+input_ids = tokenizer(code_input, return_tensors="pt").input_ids
+generated_ids = model.generate(input_ids, max_length=200)
+print(tokenizer.decode(generated_ids[0], skip_special_tokens=True))
+# output: <INSERT>; } } ;<INSERT_END> class HelloWorld { public static void main(String[] args) { System.out.println("Hello, World!") ; } } ;
+```
 
 ## Dependency
 
