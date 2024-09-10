@@ -31,13 +31,14 @@ function get_cuda_version() {
                         echo "cu102";;
                 11.3*)
                         echo "cu113";;
+                11.8*)
+                        echo "cu118";;
                 *)
                         echo "Unsupported cuda version $cuda_version_number!" 1>&2
                         exit 1
                 esac
         fi
 }
-
 
 function prepare_conda_env() {
         ### Preparing the base environment "tseval"
@@ -64,6 +65,8 @@ function prepare_conda_env() {
                 cuda_toolkit="cudatoolkit=10.2";;
         cu113)
                 cuda_toolkit="cudatoolkit=11.3 -c conda-forge";;
+        cu118)
+                cuda_toolkit="cudatoolkit=11.8 -c conda-forge";;
         *)
                 echo "Unexpected cuda version $cuda_version!" 1>&2
                 exit 1
