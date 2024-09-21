@@ -31,8 +31,8 @@ function get_cuda_version() {
                         echo "cu102";;
                 11.3*)
                         echo "cu113";;
-                11.8*)
-                        echo "cu118";;
+                11.5*)
+                        echo "cu115";;
                 *)
                         echo "Unsupported cuda version $cuda_version_number!" 1>&2
                         exit 1
@@ -53,7 +53,7 @@ function prepare_conda_env() {
         set -x
         source ${conda_path}
         conda env remove --name $env_name
-        conda create --name $env_name python=3.8 pip -y
+        conda create --name $env_name python=3.8 pip=24.0 -y
         conda activate $env_name
 
         # PyTorch
@@ -65,19 +65,20 @@ function prepare_conda_env() {
                 cuda_toolkit="cudatoolkit=10.2";;
         cu113)
                 cuda_toolkit="cudatoolkit=11.3 -c conda-forge";;
-        cu118)
-                cuda_toolkit="cudatoolkit=11.8 -c conda-forge";;
+        cu115)
+                cuda_toolkit="cudatoolkit=11.5 -c conda-forge";;
         *)
                 echo "Unexpected cuda version $cuda_version!" 1>&2
                 exit 1
         esac
         
+        # Other libraries
+        pip install -r requirements.txt
+
         conda install -y pytorch=${PYTORCH_VERSION} torchvision=${TORCHVISION_VERSION} ${cuda_toolkit} -c pytorch
 
         conda install -y -c conda-forge jsonnet
 
-        # Other libraries
-        pip install -r requirements.txt
 }
 
 
