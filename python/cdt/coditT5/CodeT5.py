@@ -119,7 +119,7 @@ class CodeT5DataModule(pl.LightningDataModule):
             self.valid_dataset,
             shuffle=False,
             batch_size=self.hparams.batch_size,
-            num_workers=1,
+            num_workers=16,
             collate_fn=self.tokenizer_collate_fn,
             persistent_workers=True,
         )
@@ -129,7 +129,7 @@ class CodeT5DataModule(pl.LightningDataModule):
             self.test_dataset,
             shuffle=False,
             batch_size=self.hparams.eval_batch_size,
-            num_workers=0,
+            num_workers=16,
             collate_fn=self.tokenizer_collate_fn,
         )
 

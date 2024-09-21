@@ -4,7 +4,7 @@ pytorch_lightning==1.5.8
 recordclass==0.16.2
 sacrebleu==1.4.14
 sentencepiece==0.1.96
-setuptools==60.0.1
+setuptools==58.0.4
 seutil==0.8.4
 six==1.16.0
 tqdm==4.62.3
