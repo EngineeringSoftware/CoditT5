@@ -285,16 +285,14 @@ def compute_metrics(
         CodeBLEU = -1.0
         codebleu_scores_list = [-1.0] * len(code_preds)
         # Meteor used here
-        # meteor, meteor_scores_list = compute_meteor(
-        #     reference_list=[
-        #         [DataProcessor.subtokenize_comment(ref).split()] for ref in code_refs
-        #     ],
-        #     sentences=[
-        #         DataProcessor.subtokenize_comment(pred).split() for pred in code_preds
-        #     ],
-        # )
-        meteor = -1.0
-        meteor_scores_list = [-1.0] * len(code_preds)
+        meteor, meteor_scores_list = compute_meteor(
+            reference_list=[
+                [DataProcessor.subtokenize_comment(ref).split()] for ref in code_refs
+            ],
+            sentences=[
+                DataProcessor.subtokenize_comment(pred).split() for pred in code_preds
+            ],
+        )
     else:
         meteor = -1.0
         meteor_scores_list = [-1.0] * len(code_preds)
