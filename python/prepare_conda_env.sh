@@ -78,6 +78,7 @@ function prepare_conda_env() {
         # Other libraries
         pip install -r requirements.txt
 
+        # PyTorch libraries
         conda install -y pytorch=${PYTORCH_VERSION} torchvision=${TORCHVISION_VERSION} ${cuda_toolkit} -c pytorch ${extra_channels}
 
         conda install -y -c conda-forge jsonnet
