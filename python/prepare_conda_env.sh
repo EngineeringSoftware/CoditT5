@@ -31,13 +31,14 @@ function get_cuda_version() {
                         echo "cu102";;
                 11.3*)
                         echo "cu113";;
+                11.5*)
+                        echo "cu115";;
                 *)
                         echo "Unsupported cuda version $cuda_version_number!" 1>&2
                         exit 1
                 esac
         fi
 }
-
 
 function prepare_conda_env() {
         ### Preparing the base environment "tseval"
@@ -52,29 +53,36 @@ function prepare_conda_env() {
         set -x
         source ${conda_path}
         conda env remove --name $env_name
-        conda create --name $env_name python=3.8 pip -y
+        conda create --name $env_name python=3.8 pip=24.0 -y
         conda activate $env_name
 
         # PyTorch
         local cuda_toolkit="";
+        local extra_channels=""
         case $cuda_version in
         cpu)
                 cuda_toolkit=cpuonly;;
         cu102)
                 cuda_toolkit="cudatoolkit=10.2";;
         cu113)
-                cuda_toolkit="cudatoolkit=11.3 -c conda-forge";;
+                cuda_toolkit="cudatoolkit=11.3"
+                extra_channels="-c conda-forge";;
+        cu115)
+                cuda_toolkit="cudatoolkit=11.1"
+                extra_channels="-c conda-forge";;
         *)
                 echo "Unexpected cuda version $cuda_version!" 1>&2
                 exit 1
         esac
         
-        conda install -y pytorch=${PYTORCH_VERSION} torchvision=${TORCHVISION_VERSION} ${cuda_toolkit} -c pytorch
+        # Other libraries
+        pip install -r requirements.txt
+
+        # PyTorch libraries
+        conda install -y pytorch=${PYTORCH_VERSION} torchvision=${TORCHVISION_VERSION} ${cuda_toolkit} -c pytorch ${extra_channels}
 
         conda install -y -c conda-forge jsonnet
 
-        # Other libraries
-        pip install -r requirements.txt
 }
 
 
