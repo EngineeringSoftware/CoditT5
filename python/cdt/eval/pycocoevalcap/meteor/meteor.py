@@ -32,17 +32,26 @@ class Meteor:
 
         eval_line = 'EVAL'
         self.lock.acquire()
-        for i in imgIds:
-            assert(len(res[i]) == 1)
-            stat = self._stat(res[i][0], gts[i])
-            eval_line += ' ||| {}'.format(stat)
+        try:
+            for i in imgIds:
+                assert(len(res[i]) == 1)
+                stat = self._stat(res[i][0], gts[i])
+                eval_line += ' ||| {}'.format(stat)
 
-        self.meteor_p.stdin.write('{}\n'.format(eval_line).encode())
-        self.meteor_p.stdin.flush()
-        for i in range(0,len(imgIds)):
-            scores.append(float(self.meteor_p.stdout.readline().strip()))
-        score = float(self.meteor_p.stdout.readline().strip())
-        self.lock.release()
+            self.meteor_p.stdin.write('{}\n'.format(eval_line).encode())
+            self.meteor_p.stdin.flush()
+            for i in range(0,len(imgIds)):
+                scores.append(float(self.meteor_p.stdout.readline().strip()))
+            score = float(self.meteor_p.stdout.readline().strip())
+        
+        except Exception as e:
+            # Log error from stderr
+            stderr_output = self.meteor_p.stderr.read().decode()
+            print(f"Error from METEOR jar: {stderr_output}")
+            raise e
+
+        finally:
+            self.lock.release()
 
         return score, scores
 
