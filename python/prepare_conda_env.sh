@@ -31,6 +31,8 @@ function get_cuda_version() {
                         echo "cu102";;
                 11.3*)
                         echo "cu113";;
+                11.4*)
+                        echo "cu114";;
                 11.5*)
                         echo "cu115";;
                 *)
@@ -64,12 +66,9 @@ function prepare_conda_env() {
                 cuda_toolkit=cpuonly;;
         cu102)
                 cuda_toolkit="cudatoolkit=10.2";;
-        cu113)
-                cuda_toolkit="cudatoolkit=11.3"
-                extra_channels="-c conda-forge";;
-        cu115)
-                cuda_toolkit="cudatoolkit=11.1"
-                extra_channels="-c conda-forge";;
+        cu113|cu114|cu115)
+            cuda_toolkit="cudatoolkit=11.1"
+            extra_channels="-c conda-forge";;
         *)
                 echo "Unexpected cuda version $cuda_version!" 1>&2
                 exit 1
