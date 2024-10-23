@@ -10,6 +10,7 @@ import numpy as np
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from recordclass import RecordClass, asdict
 from statistics import mean
+import urllib.request
 
 from cdt.eval.pycocoevalcap.meteor.meteor import Meteor
 from cdt.collector.EditSeqProducer import EditSeqProducer
@@ -43,6 +44,24 @@ class EvalOutputs(RecordClass):
     preds: List[str] = None
     ctxs: List[str] = None
     edits: List[str] = None
+
+
+def fetch_meteor_paraphrase_data():
+    paraphrase_data_url = "https://raw.githubusercontent.com/cmu-mtlab/meteor/master/data/paraphrase-en.gz"
+    file_name = "paraphrase-en.gz"
+    folder = 'cdt/eval/pycocoevalcap/meteor/data'
+    file_path = os.path.join(folder, file_name)
+
+    # Ensure the directory exists
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+
+    # Check if the file already exists
+    if not os.path.exists(file_path):
+        try:
+            urllib.request.urlretrieve(paraphrase_data_url, file_path)
+        except Exception as e:
+            print(f"Error occurred while downloading the {file_name}: {e}")    
 
 
 def compute_sentence_meteor(
@@ -81,6 +100,7 @@ def compute_sentence_meteor(
 def compute_meteor(
     reference_list: List[List[List[str]]], sentences: List[List[str]]
 ) -> Tuple[float, List[float]]:
+    fetch_meteor_paraphrase_data()
     meteor_scores = compute_sentence_meteor(reference_list, sentences)
     return sum(meteor_scores) / len(meteor_scores), meteor_scores
 
