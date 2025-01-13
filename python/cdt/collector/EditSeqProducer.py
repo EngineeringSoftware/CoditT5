@@ -1,6 +1,4 @@
-from pathlib import Path
 from typing import List
-from tqdm import tqdm
 
 from cdt.collector.diff_utils import (
     compute_minimal_comment_diffs,
@@ -9,8 +7,6 @@ from cdt.collector.diff_utils import (
     format_minimal_diff_spans,
     compute_minimal_diffs,
 )
-from cdt.collector.code_tokenizer import tokenize_java
-
 
 class EditSeqProducer:
 

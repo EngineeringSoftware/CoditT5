@@ -250,16 +250,6 @@ def process_plbart_outputs(
         " ".join(x.strip().split())
         for x in open(pred_file, "r", encoding="utf-8").readlines()
     ]  # List[str]
-    # This will be used if we use ICSE 21 code review dataset
-    # if dataset == "code-review":  # </s> in source seq to indicate the line
-    #     code_srcs = [
-    #         "".join(x.strip().split("</s>")[:-1])
-    #         for x in open(src_file, "r", encoding="utf-8").readlines()
-    #     ]
-    #     code_ctxts = [
-    #         x.strip().split("</s>")[-1]
-    #         for x in open(src_file, "r", encoding="utf-8").readlines()
-    #     ]
     if True:
         code_srcs = [
             x.strip().split("</s>")[0].rstrip()

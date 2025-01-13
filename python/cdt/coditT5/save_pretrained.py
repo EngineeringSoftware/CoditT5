@@ -8,6 +8,7 @@ logger = LoggingUtils.get_logger(__name__, LoggingUtils.INFO)
 
 
 def locate_ckpt(ckpt_dir: Path) -> Optional[Path]:
+    """Locate the checkpoint files in the directory."""
     ckpt_files = list(ckpt_dir.glob("*.ckpt"))
     if len(ckpt_files) == 0:
         ckpt_file = None
@@ -30,6 +31,7 @@ def save_pretrained(
     ckpt_name: str = None,
     output_dir: Optional[Union[Path_drw, Path_dc]] = None,
 ):
+    """Save the pretrained model from the checkpoint."""
     ckpt_dir = Path_drw(ckpt_dir)
     ckpt_dir = Path(ckpt_dir.abs_path)
     if ckpt_name:

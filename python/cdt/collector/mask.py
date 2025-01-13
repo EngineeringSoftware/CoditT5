@@ -35,6 +35,9 @@ class DatasetCorrupt:
         self.tokenizer = RobertaTokenizer.from_pretrained("Salesforce/codet5-base")
 
     def corrupt_nl(self, nl_file: str, output_file: str, fixed_file: str):
+        """
+        Corrupt the natural language sequence for pretraining. Basically use corrupt_comment() function.
+        """
         with open(nl_file, "r") as f, open(output_file, "w+") as of, open(
             fixed_file, "w+"
         ) as ff:
@@ -98,6 +101,9 @@ class DatasetCorrupt:
                     of.write(f"{corrupted_code}\n")
 
     def corrupt_comment(self, comment: List[str]):
+        """
+        Corrupt the comment through randomly delete tokens or mask tokens etc.
+        """
         try:
             length = len(comment)
             mask_indices = random_spans_noise_mask(
@@ -111,6 +117,9 @@ class DatasetCorrupt:
             return None, None
 
     def corrupt_code_snippet(self, java_code: List[str]):
+        """
+        Corrupt the code snippet through randomly delete tokens or mask tokens, based on a certain distribution.
+        """
         try:
             length = len(java_code)
             mask_indices = random_spans_noise_mask(
@@ -185,6 +194,9 @@ class DatasetCorrupt:
         return input_ids_noise, edit_labels
 
     def sample_edit_action(self, modality: str):
+        """
+        Use uniform distribution to sample the noise action from the common developers' used edit actions.
+        """
         random_prob = random.uniform(0, 1)
         if modality == "code":
             if (

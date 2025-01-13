@@ -129,6 +129,8 @@ class DataProcessor:
 
     @classmethod
     def remove_edits(self, pred: str):
+        """Removes edit tokens from the predicted string and returns the cleaned string."""
+
         tokenized_pred = pred.split()
         pred_len = len(tokenized_pred)
         for i in reversed(range(pred_len)):
@@ -166,6 +168,7 @@ class DataProcessor:
 
     @classmethod
     def remove_keep_span(cls, edit_seq: str) -> str:
+        """Remove all the <keep> special tokens from the input string."""
         span_no_keep = []
         tokenized_edits = edit_seq.split()
         i = 0
