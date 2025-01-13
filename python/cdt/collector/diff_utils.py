@@ -66,67 +66,21 @@ class EditNode:
         self.next = next
 
 
-def get_edit_keywords():
-    return [
-        REPLACE,
-        REPLACE_OLD,
-        REPLACE_NEW,
-        REPLACE_END,
-        REPLACE_OLD_KEEP_BEFORE,
-        REPLACE_NEW_KEEP_BEFORE,
-        REPLACE_OLD_KEEP_AFTER,
-        REPLACE_NEW_KEEP_AFTER,
-        REPLACE_OLD_DELETE_KEEP_BEFORE,
-        REPLACE_NEW_DELETE_KEEP_BEFORE,
-        REPLACE_OLD_DELETE_KEEP_AFTER,
-        REPLACE_NEW_DELETE_KEEP_AFTER,
-        INSERT,
-        INSERT_OLD,
-        INSERT_NEW,
-        INSERT_END,
-        INSERT_OLD_KEEP_BEFORE,
-        INSERT_NEW_KEEP_BEFORE,
-        INSERT_OLD_KEEP_AFTER,
-        INSERT_NEW_KEEP_AFTER,
-        DELETE,
-        DELETE_END,
-        KEEP,
-        KEEP_END,
-    ]
-
-
-def get_index(search_tokens, full_tokens):
-    if len(search_tokens) == 0:
-        return 0
-
-    possible_positions = [
-        k for k in range(len(full_tokens)) if full_tokens[k] == search_tokens[0]
-    ]
-    if len(possible_positions) == 0:
-        return -1
-
-    if len(possible_positions) == 1:
-        return possible_positions[0]
-
-    for p in possible_positions:
-        s_pos = 1
-        f_pos = p + 1
-        invalid = False
-
-        while s_pos < len(search_tokens) and f_pos < len(full_tokens):
-            if search_tokens[s_pos] != full_tokens[f_pos]:
-                invalid = True
-                break
-
-            s_pos += 1
-            f_pos += 1
-
-        if not invalid:
-            return p
-    return -1
-
-
 def get_valid_positions(search_str, full_str):
+    """
+    Find all valid starting positions of a search string within a full string.
+    This function splits both the search string and the full string into sequences of words.
+    It then identifies all positions in the full string where the first word of the search string appears.
+    For each of these positions, it checks if the subsequent words match the search string.
+    If they do, the position is considered valid and added to the list of valid positions.
+    Args:
+        search_str (str): The string to search for within the full string.
+        full_str (str): The string in which to search for the search string.
+    Returns:
+        list: A list of starting positions (indices) in the full string where the search string is found.
+              If the search string is empty, returns 0.
+    """
+
     search_sequence = search_str.split()
     full_sequence = full_str.split()
 
@@ -158,6 +112,17 @@ def get_frequency(search_str, full_str):
 
 
 def get_coarse_diff_structure(old_tokens, new_tokens):
+    """
+    Generates a coarse-grained diff structure between two sequences of tokens.
+    This function compares two lists of tokens (`old_tokens` and `new_tokens`) and generates
+    a list of `EditNode` objects that represent the differences between the two sequences.
+    The differences are categorized into four types: 'equal', 'replace', 'insert', and 'delete'.
+    Args:
+        old_tokens (list): The original list of tokens.
+        new_tokens (list): The new list of tokens to compare against the original.
+    Returns:
+        list: A list of `EditNode` objects representing the differences between the two sequences.
+    """
     nodes = []
     last_node = None
     for edit_type, o_start, o_end, n_start, n_end in difflib.SequenceMatcher(
@@ -184,110 +149,22 @@ def get_coarse_diff_structure(old_tokens, new_tokens):
     return nodes
 
 
-def merge_diff_actions(diff_structure):
-    mega_nodes = []
-    curr_mega_node = []
-    for node in diff_structure:
-        if len(node.children) == 1:
-            curr_mega_node.append(node)
-        else:
-            if len(curr_mega_node) == 1:
-                curr_mega_node.append(node)
-                mega_nodes.append(curr_mega_node)
-                curr_mega_node = []
-            else:
-                if len(curr_mega_node) > 0:
-                    mega_nodes.append(curr_mega_node)
-                    curr_mega_node = []
-                mega_nodes.append([node])
-
-    if len(curr_mega_node) == 1:
-        mega_nodes[-1].extend(curr_mega_node)
-    elif len(curr_mega_node) > 0:
-        mega_nodes.append(curr_mega_node)
-
-    new_nodes = []
-    for m_node in mega_nodes:
-        if len(m_node) == 1:
-            new_nodes.append(m_node[0])
-            continue
-
-        old_tokens = []
-        new_tokens = []
-        for sub in m_node:
-            if sub.edit_type == KEEP:
-                old_tokens.extend(sub.children)
-                new_tokens.extend(sub.children)
-            elif sub.edit_type == INSERT:
-                new_tokens.extend(sub.children)
-            elif sub.edit_type == DELETE:
-                old_tokens.extend(sub.children)
-            else:
-                rep_idx = sub.children.index(REPLACE_NEW)
-                old_tokens.extend(sub.children[:rep_idx])
-                new_tokens.extend(sub.children[rep_idx + 1 :])
-
-        replace_node = EditNode(
-            REPLACE, old_tokens + [REPLACE_NEW] + new_tokens, None, None
-        )
-        new_nodes.append(replace_node)
-
-    n = 0
-    final_new_nodes = []
-    while n < len(new_nodes):
-        while n < len(new_nodes) and new_nodes[n].edit_type not in [
-            INSERT,
-            REPLACE,
-            DELETE,
-        ]:
-            final_new_nodes.append(new_nodes[n])
-            n += 1
-
-        to_merge = []
-        while n < len(new_nodes) and new_nodes[n].edit_type in [
-            INSERT,
-            REPLACE,
-            DELETE,
-        ]:
-            to_merge.append(new_nodes[n])
-            n += 1
-
-        if len(to_merge) > 0:
-            old_tokens = []
-            new_tokens = []
-            for node in to_merge:
-                if node.edit_type == INSERT:
-                    new_tokens.extend(node.children)
-                elif node.edit_type == DELETE:
-                    old_tokens.extend(node.children)
-                elif node.edit_type == REPLACE:
-                    rep_idx = node.children.index(REPLACE_NEW)
-                    old_tokens.extend(node.children[:rep_idx])
-                    new_tokens.extend(node.children[rep_idx + 1 :])
-
-            replace_node = EditNode(
-                REPLACE, old_tokens + [REPLACE_NEW] + new_tokens, None, None
-            )
-            final_new_nodes.append(replace_node)
-
-        if n < len(new_nodes):
-            final_new_nodes.append(new_nodes[n])
-
-        n += 1
-
-    new_nodes = final_new_nodes
-    for n, node in enumerate(new_nodes):
-        if n > 0:
-            new_nodes[n].next = node
-            node.prev = new_nodes[n]
-        if n + 1 < len(new_nodes):
-            new_nodes[n + 1].prev = node
-            node.next = new_nodes[n + 1]
-
-    return new_nodes
-
-
 def compute_code_diffs(old_tokens, new_tokens):
+    """
+    Compute the differences between two sequences of tokens.
+    This function uses the difflib.SequenceMatcher to find the differences
+    between the old_tokens and new_tokens. It returns three lists:
+    spans, tokens, and commands, which represent the differences in various formats.
+    Args:
+        old_tokens (list): The list of tokens representing the original code.
+        new_tokens (list): The list of tokens representing the modified code.
+    Returns:
+        tuple: A tuple containing three lists:
+            - spans (list): A list of tokens with markers indicating the type of change.
+            - tokens (list): A list of tokens with markers for each token.
+            - commands (list): A list of commands indicating the type of change for each token.
+    """
+
     spans = []
     tokens = []
     commands = []
@@ -323,83 +200,6 @@ def compute_code_diffs(old_tokens, new_tokens):
             spans.extend([DELETE] + old_tokens[o_start:o_end] + [DELETE_END])
             for i in range(o_start, o_end):
                 tokens.extend([DELETE, old_tokens[i]])
-                commands.append(DELETE)
-
-    return spans, tokens, commands
-
-
-def compute_minimal_code_diffs(old_tokens, new_tokens):
-    spans = []
-    tokens = []
-    commands = []
-
-    for edit_type, o_start, o_end, n_start, n_end in difflib.SequenceMatcher(
-        None, old_tokens, new_tokens
-    ).get_opcodes():
-        if edit_type == "equal":
-            continue
-        elif edit_type == "replace":
-            spans.extend(
-                [REPLACE_OLD]
-                + old_tokens[o_start:o_end]
-                + [REPLACE_NEW]
-                + new_tokens[n_start:n_end]
-                + [REPLACE_END]
-            )
-            for i in range(o_start, o_end):
-                tokens.extend([REPLACE_OLD, old_tokens[i]])
-                commands.append(REPLACE_OLD)
-            for j in range(n_start, n_end):
-                tokens.extend([REPLACE_NEW, new_tokens[j]])
-                commands.extend([REPLACE_NEW, new_tokens[j]])
-        elif edit_type == "insert":
-            spans.extend([INSERT] + new_tokens[n_start:n_end] + [INSERT_END])
-            for j in range(n_start, n_end):
-                tokens.extend([INSERT, new_tokens[j]])
-                commands.extend([INSERT, new_tokens[j]])
-        else:
-            spans.extend([DELETE] + old_tokens[o_start:o_end] + [DELETE_END])
-            for i in range(o_start, o_end):
-                tokens.extend([DELETE, old_tokens[i]])
-                commands.append(DELETE)
-
-    return spans, tokens, commands
-
-
-def compute_comment_diffs(old_tokens, new_tokens):
-    spans = []
-    tokens = []
-    commands = []
-
-    diff_nodes = get_coarse_diff_structure(old_tokens, new_tokens)
-    diff_nodes = merge_diff_actions(diff_nodes)
-
-    for node in diff_nodes:
-        if node.edit_type == KEEP:
-            spans.extend([KEEP] + node.children + [KEEP_END])
-            for i in range(len(node.children)):
-                tokens.extend([KEEP, node.children[i]])
-                commands.append(KEEP)
-        elif node.edit_type == REPLACE:
-            o_end = node.children.index(REPLACE_NEW)
-            n_start = o_end + 1
-            n_end = len(node.children)
-            spans.extend([REPLACE_OLD] + node.children + [REPLACE_END])
-            for i in range(o_end):
-                tokens.extend([REPLACE_OLD, node.children[i]])
-                commands.append(REPLACE_OLD)
-            for j in range(n_start, n_end):
-                tokens.extend([REPLACE_NEW, node.children[j]])
-                commands.extend([REPLACE_NEW, node.children[j]])
-        elif node.edit_type == INSERT:
-            spans.extend([INSERT] + node.children + [INSERT_END])
-            for j in range(len(node.children)):
-                tokens.extend([INSERT, node.children[j]])
-                commands.extend([INSERT, node.children[j]])
-        else:
-            spans.extend([DELETE] + node.children + [DELETE_END])
-            for i in range(len(node.children)):
-                tokens.extend([DELETE, node.children[i]])
                 commands.append(DELETE)
 
     return spans, tokens, commands
@@ -613,6 +413,20 @@ def compute_minimal_comment_diffs(old_tokens, new_tokens):
 
 
 def compute_minimal_diffs(old_tokens, new_tokens):
+    """
+    Compute the minimal differences between two lists of tokens.
+    This function takes two lists of tokens, `old_tokens` and `new_tokens`, and computes the minimal differences
+    between them. It returns a tuple containing spans, tokens, and commands that represent the differences.
+    Args:
+        old_tokens (list of str): The list of tokens representing the old version.
+        new_tokens (list of str): The list of tokens representing the new version.
+    Returns:
+        tuple: A tuple containing three elements:
+            - spans (list of str): A list of spans representing the differences.
+            - tokens (list of str): A list of tokens involved in the differences.
+            - commands (list of str): A list of commands representing the edit operations.
+    """
+
     spans = []
     tokens = []
     commands = []
@@ -900,7 +714,7 @@ def get_location(search_tokens, reference_tokens):
 
 def format_minimal_diff_spans(reference_tokens, diff_span_tokens):
     """Format the updated sequence based on the old sequence and generated edit sequence.
-    
+
     reference_tokens: old sequence, List[str]
     diff_span_tokens: edit sequence, List[str]
     """
@@ -1067,41 +881,18 @@ def format_minimal_diff_spans(reference_tokens, diff_span_tokens):
     return " ".join(new_comment_tokens)
 
 
-def format_diff_commands(reference_tokens, commands):
-    i = 0
-    ref_ptr = 0
-    output = []
-
-    while i < len(commands):
-        command = commands[i]
-        if command in [DELETE, REPLACE_OLD]:
-            ref_ptr += 1
-        elif command == KEEP:
-            if ref_ptr < len(reference_tokens):
-                output.append(reference_tokens[ref_ptr])
-                ref_ptr += 1
-        elif command not in [INSERT, REPLACE_NEW]:
-            output.append(command)
-        i += 1
-    return " ".join(output)
-
-
-def format_diff_tokens(diff_tokens):
-    i = 0
-    output = []
-    last_command = KEEP
-
-    while i < len(diff_tokens):
-        token = diff_tokens[i]
-        if token in [INSERT, DELETE, REPLACE_OLD, REPLACE_NEW, KEEP]:
-            last_command = token
-        elif last_command in [INSERT, REPLACE_NEW, KEEP]:
-            output.append(token)
-        i += 1
-    return " ".join(output)
-
-
 def format_diff_spans(reference_tokens, diff_span_tokens):
+    """
+    Formats the diff spans by applying the diff operations (INSERT, DELETE, REPLACE, KEEP) 
+    to the reference tokens.
+    Args:
+        reference_tokens (list): A list of tokens representing the reference sequence.
+        diff_span_tokens (list): A list of tokens representing the diff operations and their spans.
+    Returns:
+        str: The formatted sequence after applying the diff operations. If the sequence contains 
+             incomplete edit sequences, an empty string is returned.
+    """
+    
     def get_next_keep_token(start_idx, sequence):
         while start_idx < len(sequence) and sequence[start_idx] != KEEP:
             start_idx += 1
@@ -1202,131 +993,3 @@ def format_diff_spans(reference_tokens, diff_span_tokens):
         if edit_keyword in output:
             return ""
     return output
-
-
-def format_parital_diff_spans(
-    reference_tokens: List[str], diff_span_tokens: List[str]
-) -> str:
-    def get_next_keep_token(start_idx, sequence):
-        while start_idx < len(sequence) and sequence[start_idx] != KEEP:
-            start_idx += 1
-
-        start_idx += 1
-        if start_idx < len(sequence):
-            return sequence[start_idx]
-        return None
-
-    ptr = 0  # ptr to reference sequence
-    output = reference_tokens.copy()
-
-    i = 0  # ptr to edit sequence
-    while i < len(diff_span_tokens):
-        token = diff_span_tokens[i]
-        i += 1
-
-        if token not in [INSERT, DELETE, REPLACE_OLD, KEEP]:
-            continue
-
-        if token == INSERT:
-            j = i
-
-            next_keep_token = get_next_keep_token(j, diff_span_tokens)
-            if next_keep_token:
-                copy_ptr = ptr
-                while copy_ptr < len(output) and output[copy_ptr] != next_keep_token:
-                    copy_ptr += 1
-                if copy_ptr < len(output):
-                    ptr = copy_ptr
-            # elif ptr < len(output):
-            #     ptr = len(output)
-
-            while j < len(diff_span_tokens) and diff_span_tokens[j] != INSERT_END:
-                output.insert(ptr, diff_span_tokens[j])
-                ptr += 1
-                j += 1
-
-            i = j + 1
-
-        elif token == DELETE:
-            j = i
-            while j < len(diff_span_tokens) and diff_span_tokens[j] != DELETE_END:
-                copy_ptr = max(0, ptr - 1)
-                while (
-                    copy_ptr < len(output) and diff_span_tokens[j] != output[copy_ptr]
-                ):
-                    copy_ptr += 1
-                if copy_ptr < len(output):
-                    output.pop(copy_ptr)
-                    ptr = copy_ptr
-                else:
-                    ptr += 1
-                j += 1
-            i = j + 1
-
-        elif token == KEEP:
-            j = i
-            while j < len(diff_span_tokens) and diff_span_tokens[j] != KEEP_END:
-                if ptr < len(output) and diff_span_tokens[j] == output[ptr]:
-                    ptr += 1
-                j += 1
-            i = j + 1
-        else:
-            j = i
-            while j < len(diff_span_tokens) and diff_span_tokens[j] != REPLACE_NEW:
-                copy_ptr = max(0, ptr - 1)
-                while (
-                    copy_ptr < len(output) and diff_span_tokens[j] != output[copy_ptr]
-                ):
-                    copy_ptr += 1
-                if copy_ptr < len(output):
-                    output.pop(copy_ptr)
-                    ptr = copy_ptr
-                else:
-                    ptr += 1
-                j += 1
-
-            j += 1
-            next_keep_token = get_next_keep_token(j, diff_span_tokens)
-            if next_keep_token:
-                copy_ptr = ptr
-                while copy_ptr < len(output) and output[copy_ptr] != next_keep_token:
-                    copy_ptr += 1
-                if copy_ptr < len(output):
-                    ptr = copy_ptr
-            # elif ptr < len(output):
-            #     ptr = len(output)
-
-            while j < len(diff_span_tokens) and diff_span_tokens[j] != REPLACE_END:
-                output.insert(ptr, diff_span_tokens[j])
-                ptr += 1
-                j += 1
-            i = j + 1
-    # Handle corner case that the model generates imcompelete edit sequences.
-    if diff_span_tokens[-1] in [DELETE_END, REPLACE_END, INSERT_END, KEEP]:
-        ptr += 1
-    output = " ".join(output[: min(len(output), ptr)])
-    for edit_keyword in EDIT_TOKENS:
-        if edit_keyword in output:
-            return ""
-    return output
-
-
-def add_space_between_keywords(edit_sequence: str) -> str:
-    """Helper function that adds space between keywords because of de-tokenization."""
-    import re
-
-    start_position_to_add_space = []
-    end_position_to_add_space = []
-    new_str = edit_sequence
-    for keyword in EDIT_TOKENS:
-        new_positions = [m.start() for m in re.finditer(keyword, edit_sequence)]
-        start_position_to_add_space.extend(new_positions)
-        end_position_to_add_space.extend([i + len(keyword) for i in new_positions])
-    position_to_add_space = sorted(
-        list(set(start_position_to_add_space + end_position_to_add_space))
-    )
-    for i, _ in enumerate(position_to_add_space):
-        position_to_add_space[i] += i
-    for i in position_to_add_space:
-        new_str = new_str[:i] + " " + new_str[i:]
-    return " ".join(new_str.strip().split())
