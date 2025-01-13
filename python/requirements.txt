@@ -1,13 +1,13 @@
 nltk==3.9
-numpy==1.20.3
+numpy==1.22
 pytorch_lightning==1.5.8
 recordclass==0.16.2
 sacrebleu==1.4.14
 sentencepiece==0.1.96
-setuptools==58.0.4
+setuptools==70.0.0
 seutil==0.8.4
 six==1.16.0
-tqdm==4.62.3
+tqdm==4.66.3
 transformers==4.16.2
 tree_sitter==0.20.0
 jsonargparse==4.1.4
