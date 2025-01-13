@@ -8,6 +8,6 @@ setuptools==58.0.4
 seutil==0.8.4
 six==1.16.0
 tqdm==4.62.3
-transformers==4.16.2
+transformers==4.38.0
 tree_sitter==0.20.0
 jsonargparse==4.1.4
