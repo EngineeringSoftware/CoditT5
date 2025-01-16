@@ -1,8 +1,7 @@
 from typing import List, Tuple, Any
 from transformers import RobertaTokenizer
-from seutil import LoggingUtils, IOUtils
+from seutil import LoggingUtils
 import numpy as np
-from pathlib import Path
 import random
 from jsonargparse import CLI
 from tqdm import tqdm
@@ -65,12 +64,12 @@ class DatasetCorrupt:
                     ff.write(f"{comment.strip()}\n")
 
     def corrupt_code(self, java_file: str, output_file: str, fixed_file: str):
-        """ Corrupt the code for pretraining.
-        
-        :param java_file: the file with each function per line
-        :param output_file: the corrupted file
-        :param fixed_file: the file with tokenized java functions
-        :param tag_file: files with tags to indicate the edit operation
+        """
+        Corrupt the code for pretraining by tokenizing Java functions, corrupting them, 
+        and writing the results to output files.
+        :param java_file: Path to the input file containing Java functions, one per line.
+        :param output_file: Path to the output file where corrupted code will be written.
+        :param fixed_file: Path to the output file where tokenized Java functions will be written.
         """
         with open(java_file, "r") as f, open(output_file, "w+") as of, open(
             fixed_file, "w+"
@@ -118,7 +117,13 @@ class DatasetCorrupt:
 
     def corrupt_code_snippet(self, java_code: List[str]):
         """
-        Corrupt the code snippet through randomly delete tokens or mask tokens, based on a certain distribution.
+        Corrupts a given Java code snippet by randomly deleting or masking tokens based on a certain distribution.
+        Args:
+            java_code (List[str]): A list of strings representing the Java code snippet to be corrupted.
+        Returns:
+            Tuple[List[str], List[int]]: A tuple containing two elements:
+            - corrupted_code_ids (List[str]): The list of strings representing the corrupted Java code.
+            - edit_labels (List[int]): The list of integers representing the labels for the edits made.
         """
         try:
             length = len(java_code)
@@ -256,7 +261,16 @@ class DatasetCorrupt:
 def random_spans_noise_mask(
     length: int, mean_span_count: float, mean_noise_span_length: int
 ) -> np.array:
-
+    """
+    Generates a mask array with indices for random spans of noise within a sequence of a given length.
+    Args:
+        length (int): The total length of the sequence.
+        mean_span_count (float): The average number of noise spans to generate.
+        mean_noise_span_length (int): The average length of each noise span.
+    Returns:
+        np.array: A binary array of the same length as the input sequence, where 1 indicates a noise token and 0 indicates a non-noise token.
+    """
+    
     orig_length = length
 
     num_noise_tokens = int(np.round(mean_span_count * mean_noise_span_length))

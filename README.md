@@ -6,6 +6,8 @@ Title: [CoditT5: Pretraining for Source Code and Natural Language Editing](https
 
 Authors: [Jiyang Zhang](https://jiyangzhang.github.io/), [Sheena Panthaplackel](https://panthap2.github.io/), [Pengyu Nie](https://pengyunie.github.io/), [Junyi Jessy Li](https://jessyli.com/), [Milos Gligoric](http://users.ece.utexas.edu/~gligoric/)
 
+We propose a novel pretraining objective which explicitly models edits and use it to build CoditT5, a large language model for software-related editing tasks that is pretrained on large amounts of source code and natural language comments. We fine-tune it on various downstream editing tasks, including comment updating, bug fixing, and automated code review. 
+
 ```bibtex
 @inproceedings{ZhangETAL22CoditT5,
   author = {Zhang, Jiyang and Panthaplackel, Sheena and Nie, Pengyu and Li, Junyi Jessy and Gligoric, Milos},
@@ -25,7 +27,6 @@ Note: It is recommended fine-tuning it before applying to downstream tasks.
 ## Introduction
 
 This repo contains the code and artifacts for reproducing the experiments in [CoditT5: Pretraining for Source Code and Natural Language Editing](https://arxiv.org/abs/2208.05446).
-In this work, we introduce CoditT5 for software **edit** tasks. CoditT5 is a large Language Model pretrained with a novel objective to explicitly model edits. CoditT5 sets the state-of-the-art for downstream tasks including comment updating, bug fixing and automated code review.
 
 The code includes:
 
